@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ntail-streams.bufferFullname" . }}-cm
+{{- with .Values.bufferConfig }}
+  data:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

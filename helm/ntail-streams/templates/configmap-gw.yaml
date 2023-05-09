@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ntail-streams.gwFullname" . }}-cm
+{{- with .Values.gwConfig }}
+  data:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}

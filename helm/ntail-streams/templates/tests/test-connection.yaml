@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "ntail-streams.gwFullname" . }}-test-connection"
+  labels:
+    {{- include "ntail-streams.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "ntail-streams.gwFullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never

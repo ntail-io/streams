@@ -1,0 +1,33 @@
+name: "ntail streams"
+
+on:
+  push:
+
+jobs:
+  integrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-go@v4
+        with:
+          go-version: '^1.20.3' # The Go version to download (if necessary) and use.
+      - run: go vet -unsafeptr=false ./...
+      - run: go test ./...
+      - uses: golangci/golangci-lint-action@v3
+  deliver:
+    needs: integrate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: "ghcr.io"
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: mamezou-tech/buildpacks-action@master
+        with:
+          image: 'ghcr.io/${{ github.repository }}'
+          builder: 'gcr.io/paketo-buildpacks/builder:base'
+      - run: |
+          docker push ghcr.io/${{ github.repository }}:latest

@@ -1,0 +1,58 @@
+syntax = "proto2";
+
+package ntail.streams.v1;
+option go_package = "github.com/ntail-io/streams/proto/v1";
+
+message Row {
+	required int64 msg_id_time = 1;
+	required int32 msg_id_clock_seq = 2;
+	required bytes msg_id_node_id = 3;
+	required int64 msg_time = 4;
+	required uint32 hash = 5;
+	required string key = 6;
+	required bytes data = 7;
+}
+
+/*
+CREATE TABLE `%s.%s.%s` (" + `
+  msg_id_time INTEGER NOT NULL,
+  msg_id_clock_seq INTEGER NOT NULL,
+  msg_id_node_id BYTES NOT NULL, -- 6 bytes
+  msg_time TIMESTAMP NOT NULL,
+  `hash` INTEGER NOT NULL,
+  key STRING NOT NULL,
+  data BYTES NOT NULL,
+
+  ingestion_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP(), -- This might be redundant
+)
+ */
+
+/*
+CREATE TABLE test1.test1 (
+  msg_id_time INTEGER NOT NULL,
+  msg_id_clock_seq INTEGER NOT NULL,
+  msg_id_node_id BYTES NOT NULL,
+
+  msg_time TIMESTAMP NOT NULL,
+
+  key STRING NOT NULL,
+  data BYTES NOT NULL,
+
+  hash_range_from INTEGER NOT NULL,
+  hash_range_to INTEGER NOT NULL,
+
+  topic STRING NOT NULL,
+  segment STRING NOT NULL,
+
+  ingestion_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP(),
+)
+
+CLUSTER BY msg_id_time, msg_id_clock_seq, msg_id_node_id
+;
+ */
+
+/*
+SELECT * FROM t WHERE (((msg_id_time > $t OR msg_id_time = $t OR msg_id_clock_seq > $seq) AND hash_range_to = $hrf AND hash_range_from = $hrf) OR ...) AND hash_range_to >= 0 AND hash_range_from <= 31';
+
+
+ */

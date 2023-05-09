@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ntail-streams.gwFullname" . }}
+  labels:
+    {{- include "ntail-streams.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.gwReplicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "ntail-streams.gwSelectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "ntail-streams.gwSelectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: {{ include "ntail-streams.gwServiceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          envFrom:
+            - configMapRef:
+                name: {{ include "ntail-streams.bufferFullname" . }}-cm
+          env:
+            - name: NTAIL_GW_ETCD_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Chart.Name }}-etcd
+                  key: etcd-root-password
+          ports:
+            - name: grpc
+              containerPort: 8081
+              protocol: TCP
+            - name: metrics
+              containerPort: 8090
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: grpc
+          readinessProbe:
+            httpGet:
+              path: /
+              port: grpc
+          resources:
+            {{- toYaml .Values.gwResources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

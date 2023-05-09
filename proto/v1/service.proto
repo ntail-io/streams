@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package ntail.streams.v1;
+option go_package = "github.com/ntail-io/streams/proto/v1";
+
+service GatewayService {
+  rpc Append(stream AppendRequest) returns (stream AppendResponse) {}
+  rpc Tail(stream TailRequest) returns (stream TailResponse) {}
+  rpc Get(GetRequest) returns (GetResponse) {}
+  rpc CreateTopic(CreateTopicRequest) returns (google.protobuf.Empty) {}
+  rpc ListTopics(ListTopicsRequest) returns (ListTopicsResponse) {}
+  rpc CreateSubscription(CreateSubscriptionRequest) returns (google.protobuf.Empty) {}
+  rpc ListSubscriptions(ListSubscriptionsRequest) returns (ListSubscriptionsResponse) {}
+}
+
+service BufferService {
+  rpc Append(stream AppendRequest) returns (stream AppendResponse) {}
+  rpc Poll(PollRequest) returns (PollResponse) {}
+  rpc Get(GetRequest) returns (GetResponse) {}
+}
+
+message GetRequest {
+  string topic = 1;
+  string key = 2;
+  int64 from_time = 3; // Unix micro time, earliest timestamp for msg.
+}
+
+message GetResponse {
+  string msg_id = 1;
+  bytes data = 2;
+}
+
+message TailRequest {
+  oneof command {
+    InitTail init = 1;
+    Bookmark commit = 2;
+    Poll poll = 3;
+  }
+}
+
+message InitTail {
+  string topic = 1;
+  string subscription = 2;
+//  string from_time = 3; // This typically only needs to be supplied the first time.
+}
+
+message Poll {
+}
+
+message Bookmark {
+  string msg_id = 1;
+}
+
+message TailResponse {
+  bytes data = 1; // Only included in case of a poll response.
+  bool eof = 2;
+}
+
+message AppendRequest {
+  int64 req_id = 1; // Client supplied id to match request and response client side.
+  string topic = 2;
+  string key = 3;
+  bytes data = 4;
+}
+
+message AppendResponse {
+  int64 req_id = 1;
+  oneof result {
+    string msg_id = 2;
+    int32 error_code = 3; // The error code, which should be an enum value of [google.rpc.Code][google.rpc.Code].
+  }
+}
+
+message CreateTopicRequest {
+  string topic = 1;
+}
+
+message ListTopicsRequest {
+}
+
+message ListTopicsResponse {
+  repeated string topics = 1;
+}
+
+message CreateSubscriptionRequest {
+  string topic = 1;
+  string subscription = 2;
+}
+
+message ListSubscriptionsRequest {
+  string topic = 1;
+}
+
+message ListSubscriptionsResponse {
+  repeated string subscriptions = 1;
+}
+
+message PollRequest {
+  SegmentAddress addr = 1;
+  int64 from_time = 2;
+  Bookmark bookmark = 3;
+}
+
+message SegmentAddress {
+  string topic = 1;
+  int32 hash_range_from = 2;
+  int32 hash_range_to = 3;
+  int64 from_time = 4;
+}
+
+message PollResponse {
+  bytes data = 1; // Each item in data is separated by 4 bytes (Little endian unsigned int32) that indicate length of the message.
+  int64 from_time = 2;
+  int64 to_time = 3;
+  string last_msg_id = 4;
+  bool   eof = 5;
+}
