@@ -6,8 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
-	bufboot "github.com/ntail-io/streams/internal/buffer/boot"
-	gwboot "github.com/ntail-io/streams/internal/gateway/boot"
+	bufboot "github.com/ntail-io/streams/buffer/boot"
+	gwboot "github.com/ntail-io/streams/gateway/boot"
 
 	log "github.com/sirupsen/logrus"
 )
