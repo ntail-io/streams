@@ -1,21 +1,17 @@
 package grpcio
 
 import (
-	"context"
 	"io"
 
 	v1 "github.com/ntail-io/streams/proto/v1"
 
 	"github.com/ntail-io/streams/core/types"
-	"github.com/ntail-io/streams/gateway/domain"
 	"github.com/ntail-io/streams/gateway/etcd"
 	"github.com/ntail-io/streams/gateway/tail"
 
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 )
 
@@ -118,42 +114,4 @@ func (s *GatewayService) Tail(server v1.GatewayService_TailServer) (err error) {
 			}
 		}
 	}
-}
-
-// pollBuffer polls from the buffer, also mutates the cursor.
-func (s *GatewayService) pollBuffer(ctx context.Context, addr *domain.SegmentAddress, c *cursor) (data []byte, err error) {
-	client, err := s.bufferClient(addr)
-	if err != nil {
-		return
-	}
-
-	res, err := client.Poll(ctx, &v1.PollRequest{
-		Addr: &v1.SegmentAddress{
-			Topic:         string(addr.SegmentId.Topic),
-			HashRangeFrom: int32(addr.SegmentId.HashRange.From),
-			HashRangeTo:   int32(addr.SegmentId.HashRange.To),
-			FromTime:      int64(addr.SegmentId.TimeFrom),
-		},
-		//FromTime: 0,
-		Bookmark: &v1.Bookmark{
-			MsgId: c.msgId.String(),
-		},
-	})
-	if err != nil {
-		return
-	}
-	data = res.Data
-	if data != nil {
-		c.msgId, err = uuid.Parse(res.GetLastMsgId())
-		c.finished = res.GetEof()
-	}
-	return
-}
-
-func (s *GatewayService) bufferClient(addr *domain.SegmentAddress) (client v1.BufferServiceClient, err error) {
-	conn, err := grpc.Dial(string(addr.Address), grpc.WithTransportCredentials(insecure.NewCredentials())) // TODO use TLS
-	if err != nil {
-		return
-	}
-	return v1.NewBufferServiceClient(conn), nil
 }
