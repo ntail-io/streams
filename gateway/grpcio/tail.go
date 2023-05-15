@@ -19,11 +19,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type cursor struct {
-	msgId    uuid.UUID
-	finished bool
-}
-
 // Tail will attempt to stream and entire segment to the client.
 // If the client disconnects, the segment will be released and the client will be disconnected.
 // If the segment is on the buffer, and the buffer drops the segment the client will be disconnected.
