@@ -53,13 +53,10 @@ func (s *GatewayService) CreateTopic(ctx context.Context, req *v1.CreateTopicReq
 	return &empty.Empty{}, nil
 }
 
-func (s *GatewayService) ListTopics(_ context.Context, _ *v1.ListTopicsRequest) (res *v1.ListTopicsResponse, err error) {
-	topics, err := s.topicService.List()
-	if err != nil {
-		return
-	}
+func (s *GatewayService) ListTopics(_ context.Context, _ *v1.ListTopicsRequest) (*v1.ListTopicsResponse, error) {
+	topics := s.topicService.List()
 
-	res = &v1.ListTopicsResponse{
+	res := &v1.ListTopicsResponse{
 		Topics: make([]string, len(topics)),
 	}
 
@@ -67,7 +64,7 @@ func (s *GatewayService) ListTopics(_ context.Context, _ *v1.ListTopicsRequest) 
 		res.Topics[i] = string(topic.Name)
 	}
 
-	return
+	return res
 }
 
 func (s *GatewayService) CreateSubscription(ctx context.Context, req *v1.CreateSubscriptionRequest) (*empty.Empty, error) {

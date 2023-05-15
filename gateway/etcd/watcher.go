@@ -233,7 +233,7 @@ func (w *Watcher) handleTopicKv(kv *mvccpb.KeyValue) (err error) {
 		return
 	}
 
-	err = w.topicService.Add(name, size)
+	w.topicService.Add(name, size)
 	return
 }
 

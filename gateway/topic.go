@@ -23,7 +23,7 @@ func NewTopicService() *TopicService {
 	}
 }
 
-func (s *TopicService) List() ([]*domain.Topic, error) {
+func (s *TopicService) List() []*domain.Topic {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -32,7 +32,7 @@ func (s *TopicService) List() ([]*domain.Topic, error) {
 		topics = append(topics, topic)
 	}
 
-	return topics, nil
+	return topics
 }
 
 func (s *TopicService) Get(name types.Topic) (*domain.Topic, error) {
@@ -47,7 +47,7 @@ func (s *TopicService) Get(name types.Topic) (*domain.Topic, error) {
 	return topic, nil
 }
 
-func (s *TopicService) Add(name types.Topic, size types.HashRangeSize) error {
+func (s *TopicService) Add(name types.Topic, size types.HashRangeSize) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -58,6 +58,4 @@ func (s *TopicService) Add(name types.Topic, size types.HashRangeSize) error {
 	} else {
 		topic.HashRangeSize(size)
 	}
-
-	return nil
 }
