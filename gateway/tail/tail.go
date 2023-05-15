@@ -19,11 +19,6 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-type cursor struct {
-	msgId    uuid.UUID
-	finished bool
-}
-
 type TailSessionOptions struct {
 	BQReaderService *bigquery.ReaderService
 	Sess            *etcd.TailSession
