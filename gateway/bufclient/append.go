@@ -22,12 +22,12 @@ type AppendStreamPool struct {
 	mu          sync.RWMutex
 }
 
-func NewAppendStreamPool(ctx context.Context, opts grpc.DialOption) *AppendStreamPool {
+func NewAppendStreamPool(ctx context.Context, opts ...grpc.DialOption) *AppendStreamPool {
 	return &AppendStreamPool{
 		Ctx:         ctx,
 		ResCh:       make(chan *v1.AppendResponse, 10_000),
 		Streams:     make(map[domain.BufferAddress]AppendChan),
-		DialOptions: []grpc.DialOption{opts},
+		DialOptions: opts,
 	}
 }
 
