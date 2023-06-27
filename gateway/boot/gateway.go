@@ -35,9 +35,11 @@ func Start(ctx context.Context) {
 	// BigQuery
 	bqReaderService := bigquery.NewReaderService(bqReadClient, vip.GetString("gcp_project_id"))
 
+	etcdEndpoints := vip.GetStringSlice("etcd_endpoints")
+
 	// Etcd
 	etcdClient, err := clientv3.New(clientv3.Config{
-		Endpoints:   []string{"localhost:2379"},
+		Endpoints:   etcdEndpoints,
 		DialTimeout: 10 * time.Second,
 		Username:    vip.GetString("etcd_user"),
 		Password:    vip.GetString("etcd_pass"),
