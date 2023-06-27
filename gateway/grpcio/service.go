@@ -64,7 +64,7 @@ func (s *GatewayService) ListTopics(_ context.Context, _ *v1.ListTopicsRequest) 
 		res.Topics[i] = string(topic.Name)
 	}
 
-	return res
+	return res, nil
 }
 
 func (s *GatewayService) CreateSubscription(ctx context.Context, req *v1.CreateSubscriptionRequest) (*empty.Empty, error) {
