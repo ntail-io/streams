@@ -92,8 +92,9 @@ func Start(ctx context.Context) {
 			log.WithError(err).Fatal("failed to get hostname")
 			return
 		}
-		vip.SetDefault("grpc_addr", fmt.Sprintf("%s:%d", hostname, 8080))
-		addr = vip.GetString("grpc_addr")
+		vip.SetDefault("grpc_addr", hostname)
+		vip.SetDefault("grpc_port", 8080)
+		addr = fmt.Sprintf("%s:%d", vip.GetString("grpc_addr"), vip.GetInt("grpc_port"))
 	}
 
 	segmentRepo := repo.NewSegmentRepo(sess, addr)

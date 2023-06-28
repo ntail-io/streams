@@ -76,7 +76,7 @@ func (s *LeaseService) tryLease(ctx context.Context, topic types.Topic) error {
 	rangeSizeKey := fmt.Sprintf("/topic_range_sizes/%s", topic)
 	res, err := s.Sess.Client().Get(ctx, rangeSizeKey)
 	if err != nil {
-		return err
+		return errh
 	}
 	if res.Count == 0 {
 		return fmt.Errorf("topic %s does not exist", topic) // TODO Make sure everything for this topic is closed!
