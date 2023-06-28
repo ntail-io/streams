@@ -112,6 +112,7 @@ func Start(ctx context.Context) {
 		Repo:         segmentRepo,
 		Conn:         bqConn,
 		FlushEnabled: vip.GetBool("bq_flush"),
+		Ctx:          ctx,
 	}
 
 	_ = etcd.NewLeaseService(ctx, addr, sess, segProps)
