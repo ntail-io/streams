@@ -124,9 +124,9 @@ func (s *SegmentService) Append(cmd *commands.Append) error {
 				}
 			}
 		}() // TODO Should be in init function
-		// if err := s.init(); err != nil {
-		// 	return err
-		// }
+		if err := s.init(); err != nil {
+			return err
+		}
 	}
 
 	if !s.Segment.HashRange.Contains(cmd.Hash) {
