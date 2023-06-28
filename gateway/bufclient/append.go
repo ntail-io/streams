@@ -10,6 +10,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type AppendChan = chan *v1.AppendRequest
@@ -88,7 +89,7 @@ type AppendStream struct {
 func newAppendStream(ctx context.Context, cancel context.CancelFunc,
 	addr domain.BufferAddress, resCh chan *v1.AppendResponse) (reqCh AppendChan, err error) {
 
-	conn, err := grpc.Dial(string(addr))
+	conn, err := grpc.Dial(string(addr), grpc.WithTransportCredentials(insecure.NewCredentials())) // TODO Use TLS/ALTS
 	if err != nil {
 		return
 	}
