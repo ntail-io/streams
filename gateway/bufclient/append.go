@@ -35,6 +35,7 @@ func NewAppendStreamPool(ctx context.Context, opts ...grpc.DialOption) *AppendSt
 func (p *AppendStreamPool) Append(addr domain.BufferAddress, req *v1.AppendRequest) {
 	reqCh, err := p.open(addr)
 	if err != nil {
+		log.WithError(err).Warnf("could not open buffer stream: %s", addr)
 		p.ResCh <- &v1.AppendResponse{
 			ReqId:  req.ReqId,
 			Result: &v1.AppendResponse_ErrorCode{ErrorCode: int32(codes.Unavailable)},
