@@ -52,7 +52,7 @@ func Start(ctx context.Context) {
 	}
 
 	// Allocator
-	allocator := domain.NewChunkAllocator(domain.WithAllocatorSize((1<<30)*4), domain.WithFullChThreshold(10))
+	allocator := domain.NewChunkAllocator(domain.WithAllocatorSize(4<<30), domain.WithFullChThreshold(10))
 
 	// Etcd
 	var (

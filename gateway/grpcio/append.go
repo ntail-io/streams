@@ -27,6 +27,8 @@ func (s *GatewayService) Append(server v1.GatewayService_AppendServer) error {
 		}
 	}
 
+	log.Info("append stream opened") // TODO remove
+
 	// Request routine
 	go func() {
 		for {
@@ -36,7 +38,7 @@ func (s *GatewayService) Append(server v1.GatewayService_AppendServer) error {
 			default:
 				req, err := server.Recv()
 				if err == io.EOF {
-					return
+					return // TODO Handle EOF better, wait for all responses to be sent and close the stream
 				}
 				if err != nil {
 					log.WithError(err).Error("could not read request")
