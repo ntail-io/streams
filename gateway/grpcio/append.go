@@ -27,8 +27,6 @@ func (s *GatewayService) Append(server v1.GatewayService_AppendServer) error {
 		}
 	}
 
-	log.Info("append stream opened") // TODO remove
-
 	// Request routine
 	go func() {
 		for {

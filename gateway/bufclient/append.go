@@ -69,6 +69,8 @@ func (p *AppendStreamPool) open(addr domain.BufferAddress) (AppendChan, error) {
 		return nil, err
 	}
 
+	p.Streams[addr] = reqCh
+
 	// close the stream when the context is done
 	// This will be done when the stream is closed or on shutdown
 	go func() {
